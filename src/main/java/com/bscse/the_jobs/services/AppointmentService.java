@@ -12,10 +12,7 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -36,6 +33,7 @@ public class AppointmentService implements AppointmentCreator {
 
     @Override
     public boolean makeAppointment(Appointment appointment) {
+        //----------Create appointment
         try {
             CollectionReference inq = firestore.collection(APPOINTMENT_COLLECTION_NAME);
             inq.add(appointment);
@@ -52,7 +50,7 @@ public class AppointmentService implements AppointmentCreator {
     public List<Appointment> getAppointmentByConsultant(String scheduleDate, String nic) throws ExecutionException, InterruptedException {
 
         //-------Fetch all appointments by scheduled date and time
-        
+
         CollectionReference availability = firestore.collection(AVAILABILITY_COLLECTION_NAME);
         CollectionReference appointment = firestore.collection(APPOINTMENT_COLLECTION_NAME);
 
@@ -154,7 +152,7 @@ public class AppointmentService implements AppointmentCreator {
         try{
             //Fetch appointment details by nic
             CollectionReference appointment = firestore.collection(APPOINTMENT_COLLECTION_NAME);
-            Query query = appointment.whereEqualTo("nic", nic).whereEqualTo("appointmentState", "Approve");
+            Query query = appointment.whereEqualTo("nic", nic);
             QuerySnapshot querySnapshot = query.get().get();
 
             List<Appointment> filteredAppointment = new ArrayList<>();

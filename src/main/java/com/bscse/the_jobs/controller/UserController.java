@@ -90,11 +90,11 @@ public class UserController {
         UserService userService = serviceFactory.createUserService();
         AppointmentService appointmentService = serviceFactory.createAppointmentService();
         try{
-            boolean checkAccount = userService.checkIfRegistered(nic);
-            if (checkAccount == true){
-                List<Appointment> appointmentList = appointmentService.fetchAppointmentByUser(nic);
-                return ResponseEntity.ok(appointmentList);
-            }
+//            boolean checkAccount = userService.checkIfRegistered(nic);
+//            if (checkAccount == true){
+            List<Appointment> appointmentList = appointmentService.fetchAppointmentByUser(nic);
+            return ResponseEntity.ok(appointmentList);
+//            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -111,25 +111,25 @@ public class UserController {
         UserService userService = serviceFactory.createUserService();
         try {
             userService.addConsultantData(consultant);
-                boolean signupSuccess = userService.signup(consultant.getEmail(), consultant.getPassword());
-                if (signupSuccess){
-                    Email email = new Email();
-                    EmailService emailService = serviceFactory.createEmailService();
-                    email.setRecipient(consultant.getEmail());
-                    email.setMsgBody(MSG_BODY);
-                    email.setSubject(MSG_SUBJECT);
+            boolean signupSuccess = userService.signup(consultant.getEmail(), consultant.getPassword());
+            if (signupSuccess){
+                Email email = new Email();
+                EmailService emailService = serviceFactory.createEmailService();
+                email.setRecipient(consultant.getEmail());
+                email.setMsgBody(MSG_BODY);
+                email.setSubject(MSG_SUBJECT);
 
-                    boolean isEmailSent = emailService.sendMail(email);
-                    if (isEmailSent){
-                        return ResponseEntity.status(HttpStatus.OK).body("User created and email sent successfully");
-                    }else {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create user.");
-                    }
-
-
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create user");
+                boolean isEmailSent = emailService.sendMail(email);
+                if (isEmailSent){
+                    return ResponseEntity.status(HttpStatus.OK).body("User created and email sent successfully");
+                }else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create user.");
                 }
+
+
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create user");
+            }
 
         }catch (Exception e){
             e.printStackTrace();

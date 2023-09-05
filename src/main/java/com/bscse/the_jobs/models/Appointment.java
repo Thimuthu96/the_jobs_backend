@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class Appointment extends JobSeeker {
-    private int appointmentId;
+    private String appointmentId;
+    private String consultantId;
     private String cvUrl;
     private String scheduledDate;
     private Map<String, Boolean> scheduledTime;
@@ -13,20 +14,29 @@ public class Appointment extends JobSeeker {
     public Appointment(){
     }
 
-    public Appointment(String name, String nic, String email, String password, int contactNumber, String userRole, int appointmentId, String cvUrl, String scheduledDate, Map<String, Boolean> scheduledTime, String appointmentState) {
+    public Appointment(String name, String nic, String email, String password, int contactNumber, String userRole, String appointmentId, String consultantId, String cvUrl, String scheduledDate, Map<String, Boolean> scheduledTime, String appointmentState) {
         super(name, nic, email, password, contactNumber, userRole);
         this.appointmentId = appointmentId;
+        this.consultantId = consultantId;
         this.cvUrl = cvUrl;
         this.scheduledDate = scheduledDate;
         this.scheduledTime = scheduledTime;
         this.appointmentState = appointmentState;
     }
 
-    public int getAppointmentId() {
+    public String getAppointmentId() {
         return appointmentId;
     }
-    public void setAppointmentId(int appointmentId) {
+    public void setAppointmentId(String appointmentId) {
         this.appointmentId = appointmentId;
+    }
+
+    public String getConsultantId() {
+        return consultantId;
+    }
+
+    public void setConsultantId(String consultantId) {
+        this.consultantId = consultantId;
     }
 
     public String getCvUrl() {
