@@ -97,28 +97,28 @@ public class UserService implements AuthService {
 
     @Override
     public boolean checkJobSeekerUser(String email) {
-            try{
-                CollectionReference users = firestore.collection(JOBSEEKER_COLLECTION_NAME);
+        try{
+            CollectionReference users = firestore.collection(JOBSEEKER_COLLECTION_NAME);
 
-                // Create a query to filter users by email and user_role
-                Query query = users.whereEqualTo("email", email);
+            // Create a query to filter users by email and user_role
+            Query query = users.whereEqualTo("email", email);
 
-                QuerySnapshot querySnapshot = query.get().get();
+            QuerySnapshot querySnapshot = query.get().get();
 
-                List<User> filteredUsers = new ArrayList<>();
-                for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
-                    User user = document.toObject(User.class);
-                    filteredUsers.add(user);
-                }
-
-                if (filteredUsers.isEmpty()){
-                    return false;
-                }else {
-                    return true;
-                }
-            }catch (FirestoreException | InterruptedException | ExecutionException e){
-                return false;
+            List<User> filteredUsers = new ArrayList<>();
+            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                User user = document.toObject(User.class);
+                filteredUsers.add(user);
             }
+
+            if (filteredUsers.isEmpty()){
+                return false;
+            }else {
+                return true;
+            }
+        }catch (FirestoreException | InterruptedException | ExecutionException e){
+            return false;
+        }
     }
 
 
@@ -186,11 +186,26 @@ public class UserService implements AuthService {
 
 
 
-    public boolean updateConsultantState(Consultant consultant, String docId){
-        //Update consultant account state
-        ApiFuture<WriteResult> collectionApiFuture = firestore.collection(CONSULTANT_COLLECTION_NAME).document(docId).set(consultant);
+    public boolean updateConsultantState(String nic){
+
         try {
-            collectionApiFuture.get().getUpdateTime().toString();
+
+            Query query = firestore.collection(CONSULTANT_COLLECTION_NAME).whereEqualTo("nic", nic);
+            QuerySnapshot querySnapshot = query.get().get();
+
+            // Check if the query returned any documents
+            if (!querySnapshot.isEmpty()) {
+                for (QueryDocumentSnapshot document : querySnapshot) {
+                    // Update the document with the new values
+                    DocumentReference documentRef = firestore.collection(CONSULTANT_COLLECTION_NAME).document(document.getId());
+                    ApiFuture<WriteResult> updateFuture = documentRef.update(
+                            "accountState", "Approved"
+                    );
+                    updateFuture.get(); // Wait for the update to complete
+                }
+            } else {
+                return false;
+            }
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -199,5 +214,69 @@ public class UserService implements AuthService {
         }
         return true;
     }
+
+
+
+
+
+    public boolean updateConsultantData(Consultant consultant){
+
+        try {
+
+            Query query = firestore.collection(CONSULTANT_COLLECTION_NAME).whereEqualTo("nic", consultant.getNic());
+            QuerySnapshot querySnapshot = query.get().get();
+
+            // Check if the query returned any documents
+            if (!querySnapshot.isEmpty()) {
+                for (QueryDocumentSnapshot document : querySnapshot) {
+                    // Update the document with the new values
+                    DocumentReference documentRef = firestore.collection(CONSULTANT_COLLECTION_NAME).document(document.getId());
+                    ApiFuture<WriteResult> updateFuture = documentRef.update(
+                            "contactNumber", consultant.getContactNumber(),
+                            "name", consultant.getName(),
+                            "specializeJobField", consultant.getSpecializeJobField()
+                    );
+                    updateFuture.get(); // Wait for the update to complete
+                }
+            } else {
+                return false;
+            }
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
+
+
+
+
+    public List<Consultant> getConsultantData(String nic) throws ExecutionException, InterruptedException {
+
+        //-------Fetch consultant data by nic
+        List<Consultant> consultant = new ArrayList<>();
+        try {
+            CollectionReference consultantData = firestore.collection(CONSULTANT_COLLECTION_NAME);
+            Query query1 = consultantData.whereEqualTo("nic", nic);
+            QuerySnapshot querySnapshot1 = query1.get().get();
+
+
+            for (QueryDocumentSnapshot document : querySnapshot1.getDocuments()) {
+                Consultant consultantInfo = document.toObject(Consultant.class);
+                consultant.add(consultantInfo);
+            }
+        }catch (FirestoreException e){
+            e.printStackTrace();
+        }
+
+        return consultant;
+    }
+
+
+
+
 
 }

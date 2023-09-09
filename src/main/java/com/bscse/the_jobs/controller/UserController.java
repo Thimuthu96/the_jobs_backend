@@ -90,11 +90,11 @@ public class UserController {
         UserService userService = serviceFactory.createUserService();
         AppointmentService appointmentService = serviceFactory.createAppointmentService();
         try{
-//            boolean checkAccount = userService.checkIfRegistered(nic);
-//            if (checkAccount == true){
-            List<Appointment> appointmentList = appointmentService.fetchAppointmentByUser(nic);
-            return ResponseEntity.ok(appointmentList);
-//            }
+            boolean checkAccount = userService.checkIfRegistered(nic);
+            if (checkAccount == true){
+                List<Appointment> appointmentList = appointmentService.fetchAppointmentByUser(nic);
+                return ResponseEntity.ok(appointmentList);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -163,6 +163,26 @@ public class UserController {
 
 
 
+    @GetMapping("/consultant/check/appointment")
+    public ResponseEntity<List<Appointment>> getAppointByConsultant(@RequestParam String consultantId){
+        UserService userService = serviceFactory.createUserService();
+        AppointmentService appointmentService = serviceFactory.createAppointmentService();
+        try{
+//            boolean checkAccount = userService.checkIfRegistered(nic);
+//            if (checkAccount == true){
+            List<Appointment> appointmentList = appointmentService.fetchAppointmentByConsultantId(consultantId);
+            return ResponseEntity.ok(appointmentList);
+//            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+
     @GetMapping("/validate-user-role")
     public ResponseEntity<String> filterUsersByEmailAndJobRole(
             @RequestParam String email,
@@ -201,13 +221,12 @@ public class UserController {
 
     @PutMapping("/consultant/status-update")
     public ResponseEntity<String> updateConsultantStatus(
-            @RequestBody Consultant consultant,
-            @RequestBody String documentId
+            @RequestBody String nic
     )throws ExecutionException, InterruptedException{
-        //-------Update appointment state
+        //-------Update consultant state
         try {
             UserService userService = serviceFactory.createUserService();
-            boolean success = userService.updateConsultantState(consultant, documentId);
+            boolean success = userService.updateConsultantState(nic);
             if (success){
                 return ResponseEntity.status(HttpStatus.OK).body("Consultant status updated successfully!");
             }else {
@@ -223,5 +242,42 @@ public class UserController {
 
 
 
+    @GetMapping("/consultants-info")
+    public ResponseEntity<List<Consultant>> fetchConsultantByNic(
+            @RequestParam String nic
+    ){
+        //-------Fetch consultant data by email
+        UserService userService = serviceFactory.createUserService();
+        try {
+            List<Consultant> consultantDetailList = userService.getConsultantData(nic);
+            return ResponseEntity.ok(consultantDetailList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+    @PutMapping("/consultant/update")
+    public ResponseEntity<String> updateConsultantData(
+            @RequestBody Consultant consultant
+    )throws ExecutionException, InterruptedException{
+        //-------Update consultant data
+        try {
+            UserService userService = serviceFactory.createUserService();
+            boolean success = userService.updateConsultantData(consultant);
+            if (success){
+                return ResponseEntity.status(HttpStatus.OK).body("Consultant data updated successfully!");
+            }else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Consultant couldn't update");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update consultant");
+        }
+    }
 
 }
