@@ -27,7 +27,7 @@ public class AppointmentController {
 //    private final AppointmentService appointmentService;
 
     private final ServiceFactory serviceFactory;
-    private static final String MSG_BODY = "You have successfully placed your appointment!\nYour consultant agent will approve it as soon as possible.";
+    private static final String MSG_BODY = "You have successfully placed your appointment!\nOne of our consultant agent will approve it as soon as possible.";
     private static final String MSG_SUBJECT = "The Jobs - Appointment Queued!";
 
 
@@ -91,13 +91,13 @@ public class AppointmentController {
 
     @PutMapping("/appointment/status-update")
     public ResponseEntity<String> updateAppointmentStatus(
-            @RequestBody Appointment appointment,
-            @RequestBody String documentId
+            @RequestParam String appointmentId,
+            @RequestParam String consultantId
     )throws ExecutionException, InterruptedException{
         //-------Update appointment state
         AppointmentService appointmentService = serviceFactory.createAppointmentService();
         try {
-            boolean success = appointmentService.updateAppointmentState(appointment, documentId);
+            boolean success = appointmentService.approveAppointment(appointmentId, consultantId);
             if (success){
                 return ResponseEntity.status(HttpStatus.OK).body("Appointment updated successfully!");
             }else {
@@ -108,6 +108,26 @@ public class AppointmentController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update appointment");
         }
+    }
+
+
+
+
+
+    @GetMapping("/appointment/filtering")
+    public ResponseEntity<List<Appointment>> filteringAppointmentData(
+            @RequestParam String selectedDate,
+            @RequestParam String jobCategory
+    ){
+        //-------Fetch all appointments by scheduled date and time
+        AppointmentService appointmentService = serviceFactory.createAppointmentService();
+        try {
+            List<Appointment> appointmentList = appointmentService.filteringAppointmentData(selectedDate, jobCategory);
+            return ResponseEntity.ok(appointmentList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

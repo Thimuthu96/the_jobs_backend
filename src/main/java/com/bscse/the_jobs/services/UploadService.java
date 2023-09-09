@@ -3,6 +3,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,8 @@ public class UploadService {
 
     @Autowired
     public UploadService() {
+//        Storage storage = StorageOptions.getDefaultInstance().getService();
+//        bucket = storage.get("the-jobs-d0477.appspot.com");
         bucket = null;
     }
 
