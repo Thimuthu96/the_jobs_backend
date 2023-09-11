@@ -43,7 +43,6 @@ public class AppointmentService implements AppointmentCreator {
 
 
 
-
     public List<Appointment> getAppointmentByConsultant(String scheduleDate, String nic) throws ExecutionException, InterruptedException {
 
         //-------Fetch all appointments by scheduled date and time
@@ -128,11 +127,27 @@ public class AppointmentService implements AppointmentCreator {
 
 
 
-    public boolean updateAppointmentState(Appointment appointment, String docId){
-        //Update appointment state
-        ApiFuture<WriteResult> collectionApiFuture = firestore.collection(APPOINTMENT_COLLECTION_NAME).document(docId).set(appointment);
+
+    public boolean appointmentCompleted(String appointmentId){
         try {
-            collectionApiFuture.get().getUpdateTime().toString();
+            // Find the document based on "appointmentId"
+            Query query = firestore.collection(APPOINTMENT_COLLECTION_NAME).whereEqualTo("appointmentId", appointmentId);
+            QuerySnapshot querySnapshot = query.get().get();
+
+            // Check if the query returned any documents
+            if (!querySnapshot.isEmpty()) {
+                for (QueryDocumentSnapshot document : querySnapshot) {
+                    // Update the document with the new values
+                    DocumentReference documentRef = firestore.collection(APPOINTMENT_COLLECTION_NAME).document(document.getId());
+                    ApiFuture<WriteResult> updateFuture = documentRef.update(
+                            "appointmentState", "Completed"
+                    );
+                    updateFuture.get(); // Wait for the update to complete
+                }
+            } else {
+                return false;
+            }
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
@@ -217,7 +232,6 @@ public class AppointmentService implements AppointmentCreator {
                     updateFuture.get(); // Wait for the update to complete
                 }
             } else {
-                // Handle the case when no document with the specified "appointmentId" is found
                 return false;
             }
 
@@ -272,6 +286,7 @@ public class AppointmentService implements AppointmentCreator {
             throw new RuntimeException(e);
         }
     }
+
 
 
 
