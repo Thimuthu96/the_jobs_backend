@@ -187,8 +187,10 @@ public class UserService implements AuthService {
 
 
     public boolean updateConsultantState(String nic){
-
+        //Update consultant account state
+        //ApiFuture<WriteResult> collectionApiFuture = firestore.collection(CONSULTANT_COLLECTION_NAME).document(docId).set(consultant);
         try {
+//            collectionApiFuture.get().getUpdateTime().toString();
 
             Query query = firestore.collection(CONSULTANT_COLLECTION_NAME).whereEqualTo("nic", nic);
             QuerySnapshot querySnapshot = query.get().get();
@@ -200,10 +202,14 @@ public class UserService implements AuthService {
                     DocumentReference documentRef = firestore.collection(CONSULTANT_COLLECTION_NAME).document(document.getId());
                     ApiFuture<WriteResult> updateFuture = documentRef.update(
                             "accountState", "Approved"
+//                            "contactNumber", consultant.getContactNumber(),
+//                            "name", consultant.getName(),
+//                            "specializeJobField", consultant.getSpecializeJobField()
                     );
                     updateFuture.get(); // Wait for the update to complete
                 }
             } else {
+                // Handle the case when no document with the specified "appointmentId" is found
                 return false;
             }
 
@@ -220,8 +226,10 @@ public class UserService implements AuthService {
 
 
     public boolean updateConsultantData(Consultant consultant){
-
+        //Update consultant account state
+        //ApiFuture<WriteResult> collectionApiFuture = firestore.collection(CONSULTANT_COLLECTION_NAME).document(docId).set(consultant);
         try {
+//            collectionApiFuture.get().getUpdateTime().toString();
 
             Query query = firestore.collection(CONSULTANT_COLLECTION_NAME).whereEqualTo("nic", consultant.getNic());
             QuerySnapshot querySnapshot = query.get().get();
@@ -239,6 +247,7 @@ public class UserService implements AuthService {
                     updateFuture.get(); // Wait for the update to complete
                 }
             } else {
+                // Handle the case when no document with the specified "appointmentId" is found
                 return false;
             }
 
@@ -278,5 +287,88 @@ public class UserService implements AuthService {
 
 
 
+
+    public String getConsultantDataByEmail(String email) throws ExecutionException, InterruptedException {
+
+        //-------Fetch consultant data by email
+        List<Consultant> consultant = new ArrayList<>();
+        try {
+            CollectionReference consultantData = firestore.collection(CONSULTANT_COLLECTION_NAME);
+            Query query1 = consultantData.whereEqualTo("email", email);
+            QuerySnapshot querySnapshot1 = query1.get().get();
+
+
+            for (QueryDocumentSnapshot document : querySnapshot1.getDocuments()) {
+                Consultant consultantInfo = document.toObject(Consultant.class);
+                consultant.add(consultantInfo);
+            }
+        }catch (FirestoreException e){
+            e.printStackTrace();
+        }
+
+        return consultant.get(0).getNic();
+    }
+
+
+
+
+
+
+    //Get availability data by user
+    public List<ConsultantAvailability> getAvailabilityDataByUser(String nic) throws ExecutionException, InterruptedException {
+
+        //-------Fetch consultant availability data by email
+        List<ConsultantAvailability> consultantAvailabilities = new ArrayList<>();
+        try {
+            CollectionReference consultantData = firestore.collection(CONSULTANT_AVAILABILITY_COLLECTION_NAME);
+            Query query1 = consultantData.whereEqualTo("nic", nic);
+            QuerySnapshot querySnapshot1 = query1.get().get();
+
+
+            for (QueryDocumentSnapshot document : querySnapshot1.getDocuments()) {
+                ConsultantAvailability availability = document.toObject(ConsultantAvailability.class);
+                consultantAvailabilities.add(availability);
+            }
+        }catch (FirestoreException e){
+            e.printStackTrace();
+        }
+
+        return consultantAvailabilities;
+    }
+
+
+
+
+
+
+//    public boolean approveAppointment(String appointmentId, String consultantId){
+//        try {
+//            // Find the document based on "appointmentId"
+//            Query query = firestore.collection(APPOINTMENT_COLLECTION_NAME).whereEqualTo("appointmentId", appointmentId);
+//            QuerySnapshot querySnapshot = query.get().get();
+//
+//            // Check if the query returned any documents
+//            if (!querySnapshot.isEmpty()) {
+//                for (QueryDocumentSnapshot document : querySnapshot) {
+//                    // Update the document with the new values
+//                    DocumentReference documentRef = firestore.collection(APPOINTMENT_COLLECTION_NAME).document(document.getId());
+//                    ApiFuture<WriteResult> updateFuture = documentRef.update(
+//                            "consultantId", consultantId,
+//                            "appointmentState", "Approve"
+//                    );
+//                    updateFuture.get(); // Wait for the update to complete
+//                }
+//            } else {
+//                // Handle the case when no document with the specified "appointmentId" is found
+//                return false;
+//            }
+//
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return true;
+//    }
 
 }

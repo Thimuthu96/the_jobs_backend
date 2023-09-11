@@ -260,6 +260,25 @@ public class UserController {
 
 
 
+
+    @GetMapping("/consultant-nic")
+    public ResponseEntity<String> fetchConsultantByEmail(
+            @RequestParam String email
+    ){
+        //-------Fetch consultant data by email
+        UserService userService = serviceFactory.createUserService();
+        try {
+            String consultantNic = userService.getConsultantDataByEmail(email);
+            return ResponseEntity.ok(consultantNic);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
     @PutMapping("/consultant/update")
     public ResponseEntity<String> updateConsultantData(
             @RequestBody Consultant consultant
@@ -278,6 +297,25 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update consultant");
         }
+    }
+
+
+
+
+
+    @GetMapping("/consultant-availability-data")
+    public ResponseEntity<List<ConsultantAvailability>> getAvailabilityDataByUser(
+            @RequestParam String nic
+    ){
+        //-------Fetch consultant availability data by email
+        UserService userService = serviceFactory.createUserService();
+        try{
+            List<ConsultantAvailability> consultantAvailabilities = userService.getAvailabilityDataByUser(nic);
+            return ResponseEntity.ok(consultantAvailabilities);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

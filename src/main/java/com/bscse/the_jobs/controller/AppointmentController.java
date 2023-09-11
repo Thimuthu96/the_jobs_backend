@@ -114,6 +114,32 @@ public class AppointmentController {
 
 
 
+    @PutMapping("/appointment/complete")
+    public ResponseEntity<String> appointmentComplete(
+            @RequestParam String appointmentId
+    )throws ExecutionException, InterruptedException{
+        //-------Update appointment state
+        AppointmentService appointmentService = serviceFactory.createAppointmentService();
+        try {
+            boolean success = appointmentService.appointmentCompleted(appointmentId);
+            if (success){
+                return ResponseEntity.status(HttpStatus.OK).body("Appointment completed successfully!");
+            }else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Appointment couldn't update");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update appointment");
+        }
+    }
+
+
+
+
+
+
+
     @GetMapping("/appointment/filtering")
     public ResponseEntity<List<Appointment>> filteringAppointmentData(
             @RequestParam String selectedDate,
