@@ -1,9 +1,7 @@
 package com.bscse.the_jobs.Factory;
 
-import com.bscse.the_jobs.services.AppointmentService;
-import com.bscse.the_jobs.services.EmailService;
-import com.bscse.the_jobs.services.UploadService;
-import com.bscse.the_jobs.services.UserService;
+import com.bscse.the_jobs.interfaces.SuperAdmin;
+import com.bscse.the_jobs.services.*;
 import org.springframework.mail.javamail.JavaMailSender;
 
 public interface ServiceFactory {
@@ -11,6 +9,7 @@ public interface ServiceFactory {
     EmailService createEmailService();
     AppointmentService createAppointmentService();
     UploadService createUploadService();
+    AdminServices createAdminServices();
 
     JavaMailSender createMailSender();
 }
